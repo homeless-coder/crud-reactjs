@@ -1,5 +1,5 @@
 import React from "react";
-import { Navbar, Footer } from "./components";
+import { Navbar, Footer, Form } from "./components";
 import "./App.css";
 
 function App() {
@@ -7,6 +7,7 @@ function App() {
   return (
     <div className="App">
       <Navbar title="CRUD" />
+      <Form />
       <Footer />
     </div>
   );
