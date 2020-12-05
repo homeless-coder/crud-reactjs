@@ -1,9 +1,8 @@
-import React, { useRef } from "react";
+import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { Input } from "../../components";
 import { Box, Grid, Button, ListItem, ListItemText } from "@material-ui/core";
 import { FixedSizeList } from "react-window";
-import { db } from "../../database/People";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -32,9 +31,8 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Form = ({ name, surname, setName, setSurname, db, setDB, id, setId }) => {
+const Form = ({ name, surname, setName, setSurname, db, setDB, id, setId, prefix, setPrefix }) => {
   const classes = useStyles();
-  const personRef = useRef();
 
   const insert = () => {
     let obj = {};
@@ -48,32 +46,37 @@ const Form = ({ name, surname, setName, setSurname, db, setDB, id, setId }) => {
   const validateCreate = () => (!name || !surname ? true : false);
 
   const select = (id) => {
-    let [result] = db.filter(person => person.id == id);
-    console.log(result.id)
-    setName(result.name)
-    setSurname(result.surname)
-    setId(id)
+    let [result] = db.filter((person) => person.id == id);
+    console.log(result.id);
+    setName(result.name);
+    setSurname(result.surname);
+    setId(id);
   };
 
   const del = () => {
     setDB(db.filter((person) => person.id !== id));
-    setName("")
-    setSurname("")
-    setId("")
-  }
+    setName("");
+    setSurname("");
+    setId("");
+  };
 
   const update = () => {
-    let newArray = [...db]
-    let obj = {}
+    let newArray = [...db];
+    let obj = {};
     obj.name = name;
     obj.surname = surname;
     obj.id = id;
-    newArray[id] = obj
+    newArray[id] = obj;
     setDB(newArray);
+  };
+
+  const handleOnFilter = (value) => {
+    let regex = new RegExp(value, 'i');
+    return db.filter(q => (regex.test(q.name)) || (regex.test(q.surname)))
   }
 
   const renderRow = () =>
-    db.map((person, id) => (
+    handleOnFilter(prefix).map((person, id) => (
       <ListItem
         button
         onClick={() => select(person.id)}
@@ -99,7 +102,7 @@ const Form = ({ name, surname, setName, setSurname, db, setDB, id, setId }) => {
                 <Input
                   id="prefix"
                   value={null}
-                  onChange={() => {}}
+                  onChange={(e) => setPrefix(e.target.value)}
                   label="Filter prefix:"
                 />
               </Grid>
@@ -142,10 +145,14 @@ const Form = ({ name, surname, setName, setSurname, db, setDB, id, setId }) => {
                 </Button>
               </Grid>
               <Grid item>
-                <Button variant="contained" onClick={() => update()}>Update</Button>
+                <Button variant="contained" onClick={() => update()}>
+                  Update
+                </Button>
               </Grid>
               <Grid item>
-                <Button variant="contained"onClick={() => del()} >Delete</Button>
+                <Button variant="contained" onClick={() => del()}>
+                  Delete
+                </Button>
               </Grid>
               <Grid item xs={3}></Grid>
             </Grid>
