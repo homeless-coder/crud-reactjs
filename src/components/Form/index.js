@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { Input } from "../../components";
 import { Box, Grid, Button, ListItem, ListItemText } from "@material-ui/core";
@@ -32,12 +32,47 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Form = () => {
+const Form = ({ name, surname, setName, setSurname, db, setDB, id, setId }) => {
   const classes = useStyles();
+  const personRef = useRef();
+
+  const insert = () => {
+    let obj = {};
+    obj.name = name;
+    obj.surname = surname;
+    obj.id = db.length;
+
+    setDB([...db, obj]);
+  };
+
+  const validateCreate = () => (!name || !surname ? true : false);
+
+  const select = (id) => {
+    let [result] = db.filter(person => person.id == id);
+    console.log(result.id)
+    setName(result.name)
+    setSurname(result.surname)
+    setId(id)
+  };
+
+  const update = () => {
+    let newArray = [...db]
+    let obj = {}
+    obj.name = name;
+    obj.surname = surname;
+    obj.id = id;
+    newArray[id] = obj
+    setDB(newArray);
+  }
 
   const renderRow = () =>
-    db.map((person) => (
-      <ListItem button className={classes.listItem} key={person.id}>
+    db.map((person, id) => (
+      <ListItem
+        button
+        onClick={() => select(person.id)}
+        className={classes.listItem}
+        key={id}
+      >
         <ListItemText primary={`${person.surname}, ${person.name}`} />
       </ListItem>
     ));
@@ -74,22 +109,33 @@ const Form = () => {
               <Grid item xs={6}>
                 <Input
                   id="name"
-                  value={null}
-                  onChange={() => {}}
+                  value={name}
+                  onChange={(e) => {
+                    setName(e.target.value);
+                  }}
                   label="Name:"
                 />
                 <Input
                   id="surname"
-                  value={null}
-                  onChange={() => {}}
+                  value={surname}
+                  onChange={(e) => {
+                    setSurname(e.target.value);
+                  }}
                   label="Surname:"
                 />
               </Grid>
               <Grid item>
-                <Button variant="contained">Create</Button>
+                <Button
+                  variant="contained"
+                  style={validateCreate() ? { color: "white" } : null}
+                  onClick={() => insert()}
+                  disabled={validateCreate()}
+                >
+                  Create
+                </Button>
               </Grid>
               <Grid item>
-                <Button variant="contained">Update</Button>
+                <Button variant="contained" onClick={() => update()}>Update</Button>
               </Grid>
               <Grid item>
                 <Button variant="contained">Delete</Button>
