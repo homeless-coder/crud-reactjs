@@ -23,26 +23,69 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "center",
   },
   listItem: {
-      backgroundColor: "#3a3b3c",
-      color: "#b0b3b8",
-      "&:hover, &:focus": {
-        backgroundColor: "#4e4f50"
-      }
-  }
+    backgroundColor: "#3a3b3c",
+    color: "#b0b3b8",
+    "&:hover, &:focus": {
+      backgroundColor: "#4e4f50",
+    },
+  },
 }));
 
-const Form = () => {
+const Form = ({ name, surname, setName, setSurname, db, setDB, id, setId, prefix, setPrefix }) => {
   const classes = useStyles();
 
-  const renderRow = (props) => {
-    const { index, style } = props;
+  const insert = () => {
+    let obj = {};
+    obj.name = name;
+    obj.surname = surname;
+    obj.id = db.length;
 
-    return (
-      <ListItem button className={classes.listItem} key={index}>
-        <ListItemText primary={`Item ${index + 1}`} />
-      </ListItem>
-    );
+    setDB([...db, obj]);
   };
+
+  const validateCreate = () => (!name || !surname ? true : false);
+
+  const select = (id) => {
+    let [result] = db.filter((person) => person.id == id);
+    console.log(result.id);
+    setName(result.name);
+    setSurname(result.surname);
+    setId(id);
+  };
+
+  const del = () => {
+    setDB(db.filter((person) => person.id !== id));
+    setName("");
+    setSurname("");
+    setId("");
+  };
+
+  const update = () => {
+    let newArray = [...db];
+    let obj = {};
+    obj.name = name;
+    obj.surname = surname;
+    obj.id = id;
+    newArray[id] = obj;
+    setDB(newArray);
+  };
+
+  const handleOnFilter = (value) => {
+    let regex = new RegExp(value, 'i');
+    return db.filter(q => (regex.test(q.name)) || (regex.test(q.surname)))
+  }
+
+  const renderRow = () =>
+    handleOnFilter(prefix).map((person, id) => (
+      <ListItem
+        button
+        onClick={() => select(person.id)}
+        className={classes.listItem}
+        key={id}
+      >
+        <ListItemText primary={`${person.surname}, ${person.name}`} />
+      </ListItem>
+    ));
 
   return (
     <div className={classes.root}>
@@ -59,7 +102,7 @@ const Form = () => {
                 <Input
                   id="prefix"
                   value={null}
-                  onChange={() => {}}
+                  onChange={(e) => setPrefix(e.target.value)}
                   label="Filter prefix:"
                 />
               </Grid>
@@ -68,7 +111,7 @@ const Form = () => {
                   height={150}
                   width={"100%"}
                   itemSize={46}
-                  itemCount={200}
+                  itemCount={1}
                 >
                   {renderRow}
                 </FixedSizeList>{" "}
@@ -76,28 +119,42 @@ const Form = () => {
               <Grid item xs={6}>
                 <Input
                   id="name"
-                  value={null}
-                  onChange={() => {}}
+                  value={name}
+                  onChange={(e) => {
+                    setName(e.target.value);
+                  }}
                   label="Name:"
                 />
                 <Input
                   id="surname"
-                  value={null}
-                  onChange={() => {}}
+                  value={surname}
+                  onChange={(e) => {
+                    setSurname(e.target.value);
+                  }}
                   label="Surname:"
                 />
               </Grid>
               <Grid item>
-                <Button variant="contained">Create</Button>
+                <Button
+                  variant="contained"
+                  style={validateCreate() ? { color: "white" } : null}
+                  onClick={() => insert()}
+                  disabled={validateCreate()}
+                >
+                  Create
+                </Button>
               </Grid>
               <Grid item>
-                <Button variant="contained">Update</Button>
+                <Button variant="contained" onClick={() => update()}>
+                  Update
+                </Button>
               </Grid>
               <Grid item>
-                <Button variant="contained">Delete</Button>
+                <Button variant="contained" onClick={() => del()}>
+                  Delete
+                </Button>
               </Grid>
-              <Grid item xs={3}>
-              </Grid>
+              <Grid item xs={3}></Grid>
             </Grid>
           </Box>
         </Grid>
