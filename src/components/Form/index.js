@@ -55,6 +55,13 @@ const Form = ({ name, surname, setName, setSurname, db, setDB, id, setId }) => {
     setId(id)
   };
 
+  const del = () => {
+    setDB(db.filter((person) => person.id !== id));
+    setName("")
+    setSurname("")
+    setId("")
+  }
+
   const update = () => {
     let newArray = [...db]
     let obj = {}
@@ -138,7 +145,7 @@ const Form = ({ name, surname, setName, setSurname, db, setDB, id, setId }) => {
                 <Button variant="contained" onClick={() => update()}>Update</Button>
               </Grid>
               <Grid item>
-                <Button variant="contained">Delete</Button>
+                <Button variant="contained"onClick={() => del()} >Delete</Button>
               </Grid>
               <Grid item xs={3}></Grid>
             </Grid>
