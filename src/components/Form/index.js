@@ -3,6 +3,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import { Input } from "../../components";
 import { Box, Grid, Button, ListItem, ListItemText } from "@material-ui/core";
 import { FixedSizeList } from "react-window";
+import { db } from "../../database/People";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -23,26 +24,23 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "center",
   },
   listItem: {
-      backgroundColor: "#3a3b3c",
-      color: "#b0b3b8",
-      "&:hover, &:focus": {
-        backgroundColor: "#4e4f50"
-      }
-  }
+    backgroundColor: "#3a3b3c",
+    color: "#b0b3b8",
+    "&:hover, &:focus": {
+      backgroundColor: "#4e4f50",
+    },
+  },
 }));
 
 const Form = () => {
   const classes = useStyles();
 
-  const renderRow = (props) => {
-    const { index, style } = props;
-
-    return (
-      <ListItem button className={classes.listItem} key={index}>
-        <ListItemText primary={`Item ${index + 1}`} />
+  const renderRow = () =>
+    db.map((person) => (
+      <ListItem button className={classes.listItem} key={person.id}>
+        <ListItemText primary={`${person.surname}, ${person.name}`} />
       </ListItem>
-    );
-  };
+    ));
 
   return (
     <div className={classes.root}>
@@ -68,7 +66,7 @@ const Form = () => {
                   height={150}
                   width={"100%"}
                   itemSize={46}
-                  itemCount={200}
+                  itemCount={1}
                 >
                   {renderRow}
                 </FixedSizeList>{" "}
@@ -96,8 +94,7 @@ const Form = () => {
               <Grid item>
                 <Button variant="contained">Delete</Button>
               </Grid>
-              <Grid item xs={3}>
-              </Grid>
+              <Grid item xs={3}></Grid>
             </Grid>
           </Box>
         </Grid>
